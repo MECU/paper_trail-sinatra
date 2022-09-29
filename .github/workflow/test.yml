@@ -1,0 +1,28 @@
+name: Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      matrix:
+        os:
+          - ubuntu-18.04
+	  - ubuntu-20.04
+	  - ubuntu-22.04
+	ruby: [2.7, 3.0, 3.1]
+    steps:
+      - uses: actions/checkout@v2
+      - run: gem update --system
+      - run: gem update bundler
+      - run: mkdir db
+      - run: touch db/test.sqlite3
+      - run: sqlite3 db/test.sqlite3 < spec/create_db.sql
+      - run: bundle exec rubocop
+      - run: bundle exec rspec
+
